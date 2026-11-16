@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#22364f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PGDAV Attendance">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>PGDAV College Student Attendance System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#16202a;--mute:#6b7785;--line:#e3e8ed;--acc:#0f766e;--accbg:#d9f2ee;--bad:#b42318;--badbg:#fde4e1;--ok:#157347;--okbg:#dcf3e5;--warn:#9a6700;--warnbg:#fff1cc;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+
+:root[data-theme="dark"]{--bg:#0f161c;--card:#18222b;--ink:#e8eef3;--mute:#93a1ad;--line:#2a3743;--acc:#4fd1c0;--accbg:#12403b;--bad:#ff8a7a;--badbg:#4a1e19;--ok:#6ddf9d;--okbg:#17402a;--warn:#f2c14e;--warnbg:#47380f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{background:var(--card);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.logo{width:38px;height:38px;border-radius:10px;background:var(--acc);display:grid;place-items:center;color:var(--bg);font-weight:700}
+.brand b{display:block;font-size:15px}.brand span{font-size:12px;color:var(--mute)}
+nav button{all:unset;display:block;width:100%;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--mute);font-weight:600}
+nav button.on{background:var(--accbg);color:var(--acc)}
+nav button:focus-visible,.btn:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.who{margin-top:auto;font-size:13px;color:var(--mute);border-top:1px solid var(--line);padding-top:12px}
+main{padding:24px;max-width:1000px;width:100%}
+h1{font-size:24px;margin:0 0 2px}.sub{color:var(--mute);margin:0 0 20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stat small{color:var(--mute);font-size:12px}.stat div{font-size:26px;font-weight:700;margin-top:2px}
+.row{display:grid;grid-template-columns:260px 1fr;gap:16px}
+h2{font-size:16px;margin:0 0 10px}
+#qr{width:196px;height:196px;padding:8px;background:#fff;border-radius:10px;margin:0 auto 10px;display:grid;place-items:center}
+#qr.idle{opacity:.25}
+.timer{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin:8px 0}
+.timer i{display:block;height:100%;background:var(--acc);width:0}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+select{padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;width:100%}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.ok{background:var(--okbg);color:var(--ok)}.bad{background:var(--badbg);color:var(--bad)}.warn{background:var(--warnbg);color:var(--warn)}
+.log{max-height:230px;overflow:auto;margin-top:12px;font-size:13px}
+.log div{padding:7px 0;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.log .empty{color:var(--mute);border:0}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-top:1px solid var(--line);white-space:nowrap}
+th{color:var(--mute);font-size:12px;border-top:0}
+.bar{width:90px;height:6px;border-radius:4px;background:var(--line);display:inline-block;vertical-align:middle;margin-right:8px;overflow:hidden}
+.bar i{display:block;height:100%}
+.login{max-width:380px;margin:8vh auto;padding:0 16px}.login .card{display:grid;gap:10px}input{padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;width:100%}.hint{font-size:12px;color:var(--mute)}.hide{display:none!important}.sm{padding:4px 9px;font-size:12px}#home{max-width:1100px;margin:0 auto;padding:20px 16px 40px;display:grid;gap:16px}.hh{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.hero{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}.hero h1{font-size:30px;line-height:1.15;margin:8px 0}#loginSlot .login{margin:0;max-width:none;padding:0}.hw{display:grid;grid-template-columns:1fr 1fr;gap:16px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.steps div{font-size:14px;color:var(--mute)}.steps b{display:block;color:var(--ink);margin-bottom:2px}.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}@media (max-width:820px){.hero,.hw{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.hero h1{font-size:24px}}.view{display:none}.view.on{display:block}
+@media (max-width:820px){.app{grid-template-columns:1fr}aside{flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0}.who{display:none}nav{display:flex;gap:4px;width:100%;overflow-x:auto}nav button{width:auto;white-space:nowrap}.stats{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}main{padding:16px}}
+
+:root{--bg:#eaf0f6;--card:#fff;--ink:#1b2733;--mute:#6a7886;--line:#dbe3ec;--acc:#22364f;--accbg:#d6e2ef;color-scheme:light}
+body{background:linear-gradient(160deg,#e8eef5,#f6f9fc);min-height:100vh}
+.app{grid-template-columns:250px 1fr}
+aside{padding:20px 14px;background:#f5f8fb;gap:4px}
+.logo{background:#22364f;color:#fff;width:44px;height:44px;border-radius:12px}
+.logo svg{width:22px;height:22px}
+nav button{display:flex;align-items:center;gap:12px;padding:12px 14px;font-weight:500;color:#2b3a4a;border-radius:10px}
+nav button svg{width:18px;height:18px;flex:none}
+nav button.on{background:#d6e2ef;color:#16273a}
+.who{display:flex;align-items:center;gap:10px;border-top:0;padding:8px 4px}
+.av{width:32px;height:32px;border-radius:50%;background:#d6e2ef;color:#22364f;display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.who b{display:block;font-size:14px;color:var(--ink);line-height:1.2}.who small{color:var(--mute);font-size:12px}
+.who .ico{margin-left:auto;border:0;background:none;cursor:pointer;color:var(--mute);padding:6px;border-radius:6px;font-size:18px;line-height:1}
+main{padding:0;max-width:none}
+.top{display:flex;justify-content:space-between;align-items:center;padding:16px 26px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.65);position:sticky;top:0;z-index:5;backdrop-filter:blur(6px)}
+.top b{font-size:15px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:600}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--mute)}.pill.live i{background:var(--ok)}
+.view{padding:22px 26px}
+h1{font-size:26px}
+.card{box-shadow:0 1px 2px rgba(20,40,60,.06);border-radius:14px}
+.stat{border-top:3px solid #22364f}
+.stat small{text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.ctl{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;margin-bottom:16px}
+.ctl h2{margin:0;width:100%}
+.ctl label{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.ctl select{width:auto}
+.ctl .btns{margin:0 0 0 auto}
+@media (max-width:820px){.top{padding:12px 16px}.view{padding:16px}.ctl .btns{margin:0}}
+</style>
+</head>
+<body>
+<div id="home">
+<header class='hh'><div class='brand' style='margin:0'><div class='logo'>QR</div><div><b>PGDAV College Student Attendance System</b><span>University of Delhi</span></div></div><span style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'><span class='chip ok'>Software Engineering · V Sem 2026</span><button class='btn pri sm hide' id='installBtn'>Install app</button></span></header>
+<div class='hero'>
+<div><h1>Attendance that can’t be faked</h1><p class='sub'>The professor shows a QR code that changes every 30 seconds. Students scan it on their phones to mark themselves present. Reports and defaulter lists are ready the moment the class ends.</p><div class='stats' id='hStats' style='grid-template-columns:1fr 1fr'></div></div>
+<div id='loginSlot'></div>
+</div>
+<div class='hw'>
+<div class='card'><h2>Faculty</h2><div class='srow'><div><b>Prof. Chamoli Akshay</b><br><small style='color:var(--mute)'>Software Engineering · Department of Computer Science</small></div><span class='chip ok'>Professor</span></div><div class='srow'><div><b>System Administrator</b><br><small style='color:var(--mute)'>Manages students, subjects and audit log</small></div><span class='chip warn'>Admin</span></div></div>
+<div class='card'><h2>Subject-wise report</h2><div id='hSubs'></div></div>
+</div>
+<div class='card tw'><h2>Students</h2><table><thead><tr><th>Roll no.</th><th>Name</th><th>Overall attendance</th><th>Status</th></tr></thead><tbody id='hTbl'></tbody></table></div>
+<div class='card'><h2>How it works</h2><div class='steps'><div><b>1. Log in</b>Professor, student or admin, each with their own screen.</div><div><b>2. Start session</b>The professor picks a subject and a QR code appears.</div><div><b>3. Scan</b>Students scan within the time window, once per session.</div><div><b>4. Report</b>Percentages, defaulters and CSV export update instantly.</div></div></div>
+<small style='color:var(--mute)'>Project team: Shashank Roy (Roll no. 1) and team · PGDAV College · Software Engineering project 2026</small>
+</div>
+<div class="login" id="loginBox"><div class="card">
+<div class="brand"><div class="logo">QR</div><div><b>PGDAV College Student Attendance System</b><span>Professor, student and admin login</span></div></div>
+<select id="lRole"><option value="teacher">Professor</option><option value="student">Student</option><option value="admin">Admin</option></select>
+<input id="lUser" placeholder="Username or roll no." autocomplete="off"><input id="lPass" type="password" placeholder="Password">
+<button class="btn pri" id="lGo">Log in</button><div id="lErr" class="chip bad hide"></div>
+<div class="hint">Demo accounts: prof / prof123 · admin / admin123 · student roll 1 to 20 (or full name) / stud1 to stud20. Three wrong attempts lock the account for 30 seconds.</div>
+</div></div>
+<div class="app hide" id="appBox">
+<aside>
+  <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v.01M14 21h.01M17 21h4v-4"/></svg></div><div><b>PGDAV College</b><span>Student attendance</span></div></div>
+  <nav id="nav"></nav>
+  <div class="who"><div class="av" id="av"></div><div><b id="whoName"></b><small id="whoRole"></small></div><button class="ico" id="logout" title="Log out" aria-label="Log out">&#x2192;</button></div>
+</aside>
+<main>
+<div class="top"><b id="topT">Today</b><span class="pill" id="pill"><i></i><span id="pillT">Session closed</span></span></div>
+<section class="view" id="v-today">
+  <h1 id="hello"></h1>
+  <p class="sub">Today’s classes at a glance.</p>
+  <div class="stats">
+    <div class="card stat"><small>Session</small><div id="sSt">Closed</div></div>
+    <div class="card stat"><small>Present</small><div id="sP">0</div></div>
+    <div class="card stat"><small>Not yet scanned</small><div id="sA">20</div></div>
+    <div class="card stat"><small>Rejected scans</small><div id="sR">0</div></div>
+  </div>
+  <div class="card ctl"><h2>Session controls</h2>
+    <label>Subject <select id="sub"></select></label>
+    <label>Code changes every <select id="refresh"><option value="15">15 s</option><option value="30" selected>30 s</option><option value="60">60 s</option></select></label>
+    <label><input type="checkbox" id="pause" style="width:auto"> Pause scanning</label>
+    <div class="btns"><button class="btn pri" id="start">Start session</button><button class="btn" id="end" disabled>Close session</button></div>
+  </div>
+  <div class="row">
+    <div class="card" style="text-align:center">
+      <h2>Live QR code</h2>
+      <div id="qr" class="idle"></div>
+      <div class="timer"><i id="tbar"></i></div>
+      <small id="tlabel" style="color:var(--mute)">Start a session to generate a code</small>
+          </div>
+    <div class="card" id="scanHome"><div id="scan">
+      <h2>Scan simulator</h2>
+      <p class="sub" style="margin-bottom:10px">Try the security checks the way a student or attacker would.</p>
+      <select id="who"></select>
+      <div class="btns"><button class="btn pri" id="bLive">Scan live QR</button><button class="btn" id="bOld">Replay expired QR</button><button class="btn" id="bFake">Send tampered token</button></div>
+      <div class="log" id="log"><div class="empty">No scans yet.</div></div>
+    </div></div>
+  </div>
+<div class="card" style="margin-top:16px"><h2>Attendance by subject</h2><div id="tSubs"></div></div>
+</section>
+<section class="view" id="v-me">
+  <h1 id="meH"></h1><p class="sub" id="meSub"></p>
+  <div class="stats" id="meStats" style="grid-template-columns:repeat(3,1fr)"></div>
+  <div class="card" id="meScanHome"></div>
+</section>
+<section class="view" id="v-students">
+  <h1>Students</h1><p class="sub">Attendance across all subjects, including today’s session.</p>
+  <div class="card hide" id="addBox" style="margin-bottom:12px"><h2>Add student</h2><div class="btns" style="margin:0"><input id="newName" placeholder="Full name" style="max-width:260px"><button class="btn pri" id="addBtn">Add student</button></div></div>
+  <div class="card tw"><table><thead><tr><th>Roll no.</th><th>Name</th><th>Today</th><th>Overall</th><th id="thAct"></th></tr></thead><tbody id="stBody"></tbody></table></div>
+</section>
+<section class="view" id="v-reports">
+  <h1>Reports</h1><p class="sub">Students below 75% in a subject are defaulters.</p>
+  <select id="rSub" style="max-width:300px;margin-bottom:12px"></select>
+  <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card stat"><small>Class average</small><div id="rAvg">0%</div></div>
+    <div class="card stat"><small>Defaulters</small><div id="rDef">0</div></div>
+    <div class="card stat"><small>Sessions held</small><div id="rSess">0</div></div>
+  </div>
+  <div class="card tw"><h2>Defaulter list</h2><table><thead><tr><th>Roll no.</th><th>Name</th><th>Attendance</th></tr></thead><tbody id="dfBody"></tbody></table></div>
+  <div class="btns"><button class="btn" id="csv">Download CSV</button></div>
+</section>
+<section class="view" id="v-audit">
+  <h1>Audit log</h1><p class="sub">Logins, sessions, corrections and changes are recorded here.</p>
+  <div class="card tw"><table><thead><tr><th>Time</th><th>User</th><th>Action</th></tr></thead><tbody id="auBody"></tbody></table></div>
+</section>
+</main></div>
+<script>
+var SUBS=[["SE","Software Engineering",25],["DBMS","Database Systems",22],["CN","Computer Networks",24]];
+var names=["Shashank Roy","Riya Mehta","Kunal Verma","Neha Kapoor","Rohan Malhotra","Priya Nair","Arjun Bansal","Sneha Joshi","Vikram Chauhan","Tanvi Arora","Mohit Saxena","Ishita Rawat","Dev Sharma","Kavya Menon","Harsh Tyagi","Simran Kaur","Yash Pandey","Pooja Bhatt","Rahul Dahiya","Ananya Singh"];
+var PROF="Prof. Chamoli Akshay";
+var IC={today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',students:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4.5a3.5 3.5 0 0 1 0 7M18 15c2.5.6 4 2.4 4 6"/></svg>',reports:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',audit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',me:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>'};
+function $(id){return document.getElementById(id)}
+function h(s){var x=5381;for(var i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))>>>0;return x}
+var S=names.map(function(n,i){var subs={};SUBS.forEach(function(b,k){subs[b[0]]=[Math.round(b[2]*(0.6+((i*7+k*3)%35)/100)),b[2]]});return{roll:i+1,name:n,subs:subs,today:null,pw:h("stud"+(i+1))}});
+var ADM=h("admin123"),TCH=h("prof123");
+var user=null,cur="SE",token=null,oldToken=null,open=false,tick=0,rej=0,timerId=null,sess={SE:25,DBMS:22,CN:24},LIFE=30,fails={},lockUntil={},idle=0,AU=[];
+function audit(a){AU.unshift([new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}),user?user.label:"anonymous",a]);if($("auBody"))renderAudit()}
+function pc(a,t){return t?Math.round(a/t*100):0}
+function overall(s){var a=0,t=0;SUBS.forEach(function(b){a+=s.subs[b[0]][0];t+=s.subs[b[0]][1]});return pc(a,t)}
+function drawQR(){var el=$("qr");el.innerHTML="";el.classList.remove("idle");new QRCode(el,{text:"ATT|"+cur+"|"+token,width:180,height:180,correctLevel:QRCode.CorrectLevel.M})}
+function rnd(){return Math.random().toString(36).slice(2,10).toUpperCase()}
+function newToken(){oldToken=token;token=rnd();drawQR();tick=0}
+function startS(){if(open)return;open=true;cur=$("sub").value;sess[cur]++;S.forEach(function(s){s.today=null;s.subs[cur][1]++});rej=0;oldToken=null;token=rnd();drawQR();tick=0;
+$("start").disabled=true;$("end").disabled=false;$("sub").disabled=true;$("log").innerHTML='<div class="empty">Session started. Scans appear here.</div>';audit("Started "+cur+" session");
+timerId=setInterval(function(){tick++;$("tbar").style.width=(tick/LIFE*100)+"%";$("tlabel").textContent="Code changes in "+(LIFE-tick)+"s";if(tick>=LIFE)newToken()},1000);render()}
+function endS(){if(!open)return;open=false;clearInterval(timerId);token=null;$("qr").innerHTML="";$("qr").classList.add("idle");$("tbar").style.width="0";$("tlabel").textContent="Session closed. Absentees marked.";
+$("start").disabled=false;$("end").disabled=true;$("sub").disabled=false;S.forEach(function(s){if(!s.today)s.today="Absent"});audit("Closed "+cur+" session");render()}
+function log(m,c,t){var l=$("log"),e=l.querySelector(".empty");if(e)e.remove();var d=document.createElement("div");d.innerHTML='<span class="chip '+c+'">'+t+'</span><span></span>';d.lastChild.textContent=m;l.insertBefore(d,l.firstChild)}
+function scan(mode){var s=user.role==="student"?S[user.idx]:S[$("who").value];var t=mode==="live"?token:mode==="old"?(oldToken||"EXPIRED1"):"X"+rnd();var why=null;
+if(!open)why="Session is closed.";else if($("pause").checked)why="Scanning is paused by the professor.";else if(t!==token)why=mode==="old"?"Token expired. A replayed QR is not accepted.":"Invalid token. The request was tampered with.";else if(s.today==="Present")why="Already marked present for this session.";
+if(why){rej++;log(s.name+": "+why,"bad","Rejected");audit("Rejected scan for roll "+s.roll+" ("+(mode==="live"?"duplicate or closed":mode)+")")}
+else{s.today="Present";s.subs[cur][0]++;log(s.name+" marked present","ok","Present");audit("Roll "+s.roll+" marked present in "+cur)}render()}
+function fix(i){var s=S[i];if(!s.today)return;var a=s.subs[cur];if(s.today==="Present"){s.today="Absent";a[0]--}else{s.today="Present";a[0]++}audit("Manual correction: roll "+s.roll+" set to "+s.today+" ("+cur+")");render()}
+function chip(t){return t==="Present"?'<span class="chip ok">Present</span>':t==="Absent"?'<span class="chip bad">Absent</span>':'<span class="chip warn">Pending</span>'}
+function bar(v){return'<span class="bar"><i style="width:'+v+'%;background:'+(v>=75?"var(--ok)":"var(--bad)")+'"></i></span>'+v+"%"}
+function esc(x){var d=document.createElement("div");d.textContent=x;return d.innerHTML}
+function render(){renderHome();if(!user)return;$("pill").classList.toggle("live",open);$("pillT").textContent=open?"Taking scans · "+cur:"Session closed";if($("tSubs"))$("tSubs").innerHTML=$("hSubs").innerHTML;var p=S.filter(function(s){return s.today==="Present"}).length,any=S.some(function(s){return s.today});
+$("sSt").textContent=open?"Open":"Closed";$("sP").textContent=p;$("sA").textContent=any?S.length-p:S.length;$("sR").textContent=rej;
+var t=user.role==="teacher";$("thAct").textContent=t?"Correction":"";
+$("stBody").innerHTML=S.map(function(s,i){return"<tr><td>"+s.roll+"</td><td>"+esc(s.name)+"</td><td>"+chip(s.today)+"</td><td>"+bar(overall(s))+"</td><td>"+(t&&s.today?'<button class="btn sm" onclick="fix('+i+')">Mark '+(s.today==="Present"?"absent":"present")+"</button>":"")+"</td></tr>"}).join("");
+var k=$("rSub").value||"SE",d=S.filter(function(s){return pc(s.subs[k][0],s.subs[k][1])<75});
+$("rAvg").textContent=Math.round(S.reduce(function(a,s){return a+pc(s.subs[k][0],s.subs[k][1])},0)/S.length)+"%";$("rDef").textContent=d.length;$("rSess").textContent=sess[k];
+$("dfBody").innerHTML=d.length?d.map(function(s){return"<tr><td>"+s.roll+"</td><td>"+esc(s.name)+'</td><td><span class="chip bad">'+pc(s.subs[k][0],s.subs[k][1])+"%</span></td></tr>"}).join(""):'<tr><td colspan="3">No defaulters.</td></tr>';
+if(user.role==="student"){var m=S[user.idx];$("meH").textContent="Welcome, "+m.name;$("meSub").textContent="Roll no. "+m.roll+" · "+(open?"A "+cur+" session is open. Scan the QR to mark yourself present.":"No session is open right now.");
+$("meStats").innerHTML=SUBS.map(function(b){var a=m.subs[b[0]],v=pc(a[0],a[1]);return'<div class="card stat"><small>'+b[1]+'</small><div>'+v+'%</div><small>'+a[0]+" of "+a[1]+" classes "+(v<75?'<span class="chip bad">Below 75%</span>':'<span class="chip ok">Safe</span>')+"</small></div>"}).join("")}}
+function renderAudit(){$("auBody").innerHTML=AU.length?AU.map(function(r){return"<tr><td>"+r[0]+"</td><td>"+esc(r[1])+"</td><td>"+esc(r[2])+"</td></tr>"}).join(""):'<tr><td colspan="3">Nothing recorded yet.</td></tr>'}
+function csv(){var k=$("rSub").value||"SE",r=["Roll,Name,Subject,Attended,Total,Percent"].concat(S.map(function(s){var a=s.subs[k];return[s.roll,s.name,k,a[0],a[1],pc(a[0],a[1])].join(",")}));
+var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(r.join("\n"));a.download="attendance-"+k+".csv";a.click();audit("Exported CSV for "+k)}
+function show(v){$("topT").textContent=({today:"Today",me:"My attendance",students:"Students",reports:"Reports",audit:"Audit log"})[v];document.querySelectorAll(".view").forEach(function(x){x.classList.remove("on")});$("v-"+v).classList.add("on");document.querySelectorAll("#nav button").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});if(v==="audit")renderAudit()}
+function lockErr(m){var e=$("lErr");e.textContent=m;e.classList.remove("hide")}
+function login(){var role=$("lRole").value,u=$("lUser").value.trim(),p=$("lPass").value,key=role+":"+u.toLowerCase();
+if(lockUntil[key]&&Date.now()<lockUntil[key]){lockErr("Too many attempts. Try again in "+Math.ceil((lockUntil[key]-Date.now())/1000)+" seconds.");return}
+var ok=false,u2=null;
+if(role==="admin"&&u.toLowerCase()==="admin"&&h(p)===ADM){ok=true;u2={role:"admin",label:"Admin"}}
+else if(role==="teacher"&&u.toLowerCase()==="prof"&&h(p)===TCH){ok=true;u2={role:"teacher",label:PROF}}
+else if(role==="student"){var i=S.findIndex(function(s){return String(s.roll)===u||s.name.toLowerCase()===u.toLowerCase()});if(i>-1&&S[i].pw===h(p)){ok=true;u2={role:"student",idx:i,label:S[i].name+" (roll "+S[i].roll+")"}}}
+if(!ok){fails[key]=(fails[key]||0)+1;audit("Failed login for "+esc(u||"(blank)")+" as "+role);if(fails[key]>=3){lockUntil[key]=Date.now()+30000;fails[key]=0;lockErr("Account locked for 30 seconds after 3 failed attempts.")}else lockErr("Wrong username or password. "+(3-fails[key])+" attempt(s) left.");return}
+fails[key]=0;user=u2;audit("Logged in as "+role);$("lErr").classList.add("hide");$("lPass").value="";$("home").classList.add("hide");$("appBox").classList.remove("hide");setup();idle=0}
+function setup(){var r=user.role,nav={teacher:[["today","Today"],["students","Students"],["reports","Reports"],["audit","Audit log"]],admin:[["students","Students"],["reports","Reports"],["audit","Audit log"]],student:[["me","My attendance"]]}[r];
+$("nav").innerHTML=nav.map(function(n){return'<button data-v="'+n[0]+'">'+(IC[n[0]]||"")+n[1]+"</button>"}).join("");
+document.querySelectorAll("#nav button").forEach(function(b){b.onclick=function(){show(b.dataset.v)}});
+var nm=r==="student"?S[user.idx].name:r==="teacher"?PROF:"Admin";$("whoName").textContent=nm;$("whoRole").textContent=r==="teacher"?"Professor":r==="admin"?"Administrator":"Student";$("av").textContent=nm.replace(/^Prof\. /,"").charAt(0);$("hello").textContent="Welcome back, "+PROF;$("addBox").classList.toggle("hide",r!=="admin");
+if(r==="student"){$("meScanHome").appendChild($("scan"));$("who").classList.add("hide");$("scan").querySelector("h2").textContent="Scan to mark attendance"}
+else{$("scanHome").appendChild($("scan"));$("who").classList.remove("hide");$("scan").querySelector("h2").textContent="Scan simulator"}
+show(nav[0][0]);render()}
+function logout(){if(user)audit("Logged out");user=null;$("appBox").classList.add("hide");$("home").classList.remove("hide");renderHome()}
+$("sub").innerHTML=SUBS.map(function(b){return'<option value="'+b[0]+'">'+b[1]+"</option>"}).join("");
+$("rSub").innerHTML=$("sub").innerHTML;$("rSub").onchange=render;
+$("who").innerHTML=S.map(function(s,i){return'<option value="'+i+'">'+s.roll+" – "+s.name+"</option>"}).join("");
+$("refresh").onchange=function(){LIFE=+this.value};$("start").onclick=startS;$("end").onclick=endS;$("bLive").onclick=function(){scan("live")};$("bOld").onclick=function(){scan("old")};$("bFake").onclick=function(){scan("fake")};$("csv").onclick=csv;$("lGo").onclick=login;$("logout").onclick=logout;
+$("lPass").onkeydown=function(e){if(e.key==="Enter")login()};
+$("loginSlot").appendChild($("loginBox"));
+function renderHome(){var d=S.filter(function(s){return overall(s)<75}).length,avg=Math.round(S.reduce(function(a,s){return a+overall(s)},0)/S.length);
+$("hStats").innerHTML='<div class="card stat"><small>Students</small><div>'+S.length+'</div></div><div class="card stat"><small>Subjects</small><div>'+SUBS.length+'</div></div><div class="card stat"><small>Class average</small><div>'+avg+'%</div></div><div class="card stat"><small>Defaulters</small><div>'+d+'</div></div>';
+$("hSubs").innerHTML=SUBS.map(function(b){var k=b[0],av=Math.round(S.reduce(function(a,s){return a+pc(s.subs[k][0],s.subs[k][1])},0)/S.length),df=S.filter(function(s){return pc(s.subs[k][0],s.subs[k][1])<75}).length;return'<div class="srow"><div><b>'+b[1]+'</b><br><small style="color:var(--mute)">'+df+' defaulter'+(df===1?'':'s')+'</small></div><div>'+bar(av)+'</div></div>'}).join("");
+$("hTbl").innerHTML=S.map(function(s){var v=overall(s);return'<tr><td>'+s.roll+'</td><td>'+esc(s.name)+'</td><td>'+bar(v)+'</td><td>'+(v<75?'<span class="chip bad">Defaulter</span>':'<span class="chip ok">Safe</span>')+'</td></tr>'}).join("")}
+renderHome();
+$("addBtn").onclick=function(){var n=$("newName").value.trim();if(!n||n.length>60)return;var i=S.length,subs={};SUBS.forEach(function(b){subs[b[0]]=[Math.round(b[2]*0.8),b[2]]});S.push({roll:i+1,name:n,subs:subs,today:open?null:null,pw:h("stud"+(i+1))});$("who").innerHTML+='<option value="'+i+'">'+(i+1)+" – "+esc(n)+"</option>";$("newName").value="";audit("Admin added student roll "+(i+1)+": "+n);render()};
+document.addEventListener("click",function(){idle=0});setInterval(function(){if(user&&++idle>600){logout();lockErr("Logged out after 10 minutes of inactivity.")}},1000);
+var dp=null;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();dp=e;$("installBtn").classList.remove("hide")});
+$("installBtn").onclick=function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(){dp=null;$("installBtn").classList.add("hide")})};
+window.addEventListener("appinstalled",function(){$("installBtn").classList.add("hide")});
+if("serviceWorker" in navigator&&location.protocol!=="file:"){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
