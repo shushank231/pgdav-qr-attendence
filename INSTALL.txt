@@ -1,0 +1,16 @@
+# PGDAV Attendance PWA package
+
+## Publish to the existing GitHub Pages repository
+1. Extract this ZIP.
+2. Open the existing repository `shushank231/pgdav-qr-attendence`.
+3. Upload/replace `index.html` and add `manifest.webmanifest`, `sw.js`, and the `icons` folder at the repository root.
+4. Commit the changes. Keep the files together in the same root folder.
+5. Wait for GitHub Pages to redeploy, then open the site over HTTPS.
+
+## Install
+- Windows / macOS: open the deployed site in Chrome or Edge, then use the install icon in the address bar or browser menu > Install app.
+- Android: open the site in Chrome > menu (three dots) > Install app / Add to Home screen.
+- iPhone: open the site in Safari > Share > Add to Home Screen.
+
+## Important limitations
+This package makes the existing website installable as a PWA. It does not create native APK/EXE installers. The app's current attendance data is still stored in browser memory/local code; cross-device live attendance requires a shared backend and authentication. Offline caching does not make QR attendance synchronization work offline.

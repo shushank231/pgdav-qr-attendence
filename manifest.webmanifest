@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "PGDAV College Student Attendance System",
+  "short_name": "PGDAV Attendance",
+  "description": "PGDAV College student attendance system",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#edf3fa",
+  "theme_color": "#17232d",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
